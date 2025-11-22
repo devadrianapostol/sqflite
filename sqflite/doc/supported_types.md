@@ -3,7 +3,7 @@
 The API offers a way to save a record as map of type `Map<String, Object?>`. This map cannot be an
 arbitrary map:
 - Keys are column in a table (declared when creating the table)
-- Values are field values in the record of type `num`, `String` or `Uint8List`
+- Values are field values in the record of type `num`, `String`, `Uint8List`, or `DateTime`
 
 Nested content is not supported. For example, the following simple map is not supported:
 
@@ -51,8 +51,40 @@ CREATE TABLE Product (
 
 No validity check is done on values yet so please avoid non supported types [https://www.sqlite.org/datatype3.html](https://www.sqlite.org/datatype3.html)
 
-`DateTime` is not a supported SQLite type. Personally I store them as 
-int (millisSinceEpoch) or string (iso8601). SQLite `TIMESTAMP` type sometimes requires using [date functions](https://www.sqlite.org/lang_datefunc.html). 
+### DateTime Support
+
+`DateTime` objects are now supported and automatically converted to `INTEGER` (milliseconds since epoch) when storing in SQLite.
+
+```dart
+// DateTime values are automatically converted
+await db.insert('events', {
+  'name': 'Meeting',
+  'timestamp': DateTime.now(),  // Automatically converted to int
+});
+
+// When reading, convert back to DateTime
+final rows = await db.query('events');
+final timestamp = DateTime.fromMillisecondsSinceEpoch(rows.first['timestamp'] as int);
+```
+
+Utility functions are available for explicit conversion:
+```dart
+import 'package:sqflite_common/utils/utils.dart';
+
+// Convert DateTime to int for storage
+int timestampInt = dateTimeToInt(DateTime.now());
+
+// Convert int back to DateTime
+DateTime dateTime = intToDateTime(timestampInt);
+
+// Convert DateTime to ISO8601 string (alternative storage format)
+String timestampStr = dateTimeToString(DateTime.now());
+
+// Convert ISO8601 string back to DateTime
+DateTime dateTime2 = stringToDateTime(timestampStr);
+```
+
+For using SQLite's built-in `TIMESTAMP` type with date functions, see [date functions](https://www.sqlite.org/lang_datefunc.html). 
 `TIMESTAMP` values are read as `String` that the application needs to parse.
 
 `bool` is not a supported SQLite type. Use `INTEGER` and 0 and 1 values.

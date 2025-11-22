@@ -7,8 +7,18 @@ var checkThrowException = false;
 
 var _debugCheckPrinted = <String, bool>{};
 
+/// Convert a value to a supported SQLite type.
+/// DateTime objects are automatically converted to milliseconds since epoch (int).
+/// Other types are returned as-is.
+Object? convertToSupportedValue(Object? value) {
+  if (value is DateTime) {
+    return value.millisecondsSinceEpoch;
+  }
+  return value;
+}
+
 void _checkArg(dynamic arg) {
-  if ((arg is! String) && (arg is! num) && (arg is! Uint8List)) {
+  if ((arg is! String) && (arg is! num) && (arg is! Uint8List) && (arg is! DateTime)) {
     // Big int ok on the web only
     if (kSqfliteIsWeb) {
       if (arg is BigInt) {
@@ -22,7 +32,7 @@ void _checkArg(dynamic arg) {
 *** WARNING ***
 
 Invalid argument $arg with type $type.
-Only num, String and Uint8List are supported. See https://github.com/tekartik/sqflite/blob/master/sqflite/doc/supported_types.md for details
+Only num, String, Uint8List and DateTime are supported. See https://github.com/tekartik/sqflite/blob/master/sqflite/doc/supported_types.md for details
 
 This will throw an exception in the future. For now it is displayed once per type.
 

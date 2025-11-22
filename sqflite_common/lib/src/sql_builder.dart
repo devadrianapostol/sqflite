@@ -68,7 +68,7 @@ class SqlBuilder {
     delete.write(_escapeName(table));
     _writeClause(delete, ' WHERE ', where);
     sql = delete.toString();
-    arguments = whereArgs != null ? List<Object?>.from(whereArgs) : null;
+    arguments = whereArgs?.map((arg) => convertToSupportedValue(arg)).toList();
   }
 
   /// Build an SQL query string from the given clauses.
@@ -141,7 +141,7 @@ class SqlBuilder {
     }
 
     sql = query.toString();
-    arguments = whereArgs != null ? List<Object?>.from(whereArgs) : null;
+    arguments = whereArgs?.map((arg) => convertToSupportedValue(arg)).toList();
   }
 
   /// Convenience method for inserting a row into the database.
@@ -185,7 +185,9 @@ class SqlBuilder {
           sbValues.write('NULL');
         } else {
           checkNonNullValue(value);
-          bindArgs!.add(value);
+          // Convert DateTime to supported type (millisecondsSinceEpoch)
+          final convertedValue = convertToSupportedValue(value);
+          bindArgs!.add(convertedValue);
           sbValues.write('?');
         }
       });
@@ -243,7 +245,9 @@ class SqlBuilder {
       final value = values[colName];
       if (value != null) {
         checkNonNullValue(value);
-        bindArgs.add(value);
+        // Convert DateTime to supported type (millisecondsSinceEpoch)
+        final convertedValue = convertToSupportedValue(value);
+        bindArgs.add(convertedValue);
         update.write(' = ?');
       } else {
         update.write(' = NULL');
@@ -251,7 +255,9 @@ class SqlBuilder {
     }
 
     if (whereArgs != null) {
-      bindArgs.addAll(whereArgs);
+      // Convert DateTime values in whereArgs as well
+      final convertedWhereArgs = whereArgs.map((arg) => convertToSupportedValue(arg)).toList();
+      bindArgs.addAll(convertedWhereArgs);
     }
 
     _writeClause(update, ' WHERE ', where);
