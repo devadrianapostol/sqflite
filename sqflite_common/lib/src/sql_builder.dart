@@ -68,7 +68,7 @@ class SqlBuilder {
     delete.write(_escapeName(table));
     _writeClause(delete, ' WHERE ', where);
     sql = delete.toString();
-    arguments = whereArgs != null ? whereArgs.map((arg) => convertToSupportedValue(arg)).toList() : null;
+    arguments = whereArgs?.map((arg) => convertToSupportedValue(arg)).toList();
   }
 
   /// Build an SQL query string from the given clauses.
@@ -141,7 +141,7 @@ class SqlBuilder {
     }
 
     sql = query.toString();
-    arguments = whereArgs != null ? whereArgs.map((arg) => convertToSupportedValue(arg)).toList() : null;
+    arguments = whereArgs?.map((arg) => convertToSupportedValue(arg)).toList();
   }
 
   /// Convenience method for inserting a row into the database.

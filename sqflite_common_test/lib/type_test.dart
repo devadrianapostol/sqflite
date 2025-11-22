@@ -373,20 +373,24 @@ void run(SqfliteTestContext context) {
           version: 1,
           onCreate: (Database db, int version) async {
             await db.execute(
-              'CREATE TABLE Test (_id INTEGER PRIMARY KEY, value TEXT)',
+              'CREATE TABLE Test (_id INTEGER PRIMARY KEY, value INTEGER)',
             );
           },
         ),
       );
       try {
-        var failed = false;
-        try {
-          await _insertValue(DateTime.fromMillisecondsSinceEpoch(1234567890));
-        } catch (_) {
-          // } on ArgumentError catch (_) { not throwing the same exception
-          failed = true;
-        }
-        expect(failed, true);
+        // DateTime is now supported and automatically converted to int
+        final dateTime = DateTime.fromMillisecondsSinceEpoch(1234567890);
+        final id = await _insertValue(dateTime);
+        
+        // The value should be stored as int (millisecondsSinceEpoch)
+        final storedValue = await _getValue(id);
+        expect(storedValue, isA<int>());
+        expect(storedValue, dateTime.millisecondsSinceEpoch);
+        
+        // Can be converted back to DateTime
+        final restoredDateTime = DateTime.fromMillisecondsSinceEpoch(storedValue as int);
+        expect(restoredDateTime.millisecondsSinceEpoch, dateTime.millisecondsSinceEpoch);
       } finally {
         await _data.db.close();
       }
