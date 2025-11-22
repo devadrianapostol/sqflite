@@ -68,3 +68,59 @@ const sqflitePragmaPrefix = 'PRAGMA sqflite -- ';
 
 const sqflitePragmaDbDefensiveOff =
     '${sqflitePragmaPrefix}db_config_defensive_off';
+
+/// Convert a DateTime to milliseconds since epoch for storage in SQLite.
+///
+/// DateTime values are stored as INTEGER (milliseconds since epoch) in SQLite.
+/// Use this function when you need to explicitly convert a DateTime for storage.
+///
+/// Example:
+/// ```dart
+/// final timestamp = dateTimeToInt(DateTime.now());
+/// await db.insert('events', {'timestamp': timestamp});
+/// ```
+int dateTimeToInt(DateTime dateTime) {
+  return dateTime.millisecondsSinceEpoch;
+}
+
+/// Convert milliseconds since epoch to a DateTime object.
+///
+/// Use this function to convert INTEGER timestamp values read from SQLite
+/// back to DateTime objects.
+///
+/// Example:
+/// ```dart
+/// final rows = await db.query('events');
+/// final dateTime = intToDateTime(rows.first['timestamp'] as int);
+/// ```
+DateTime intToDateTime(int milliseconds) {
+  return DateTime.fromMillisecondsSinceEpoch(milliseconds);
+}
+
+/// Convert a DateTime to ISO8601 string for storage in SQLite.
+///
+/// DateTime values can be stored as TEXT in ISO8601 format in SQLite.
+/// Use this function when you prefer string representation over integer.
+///
+/// Example:
+/// ```dart
+/// final timestamp = dateTimeToString(DateTime.now());
+/// await db.insert('events', {'timestamp': timestamp});
+/// ```
+String dateTimeToString(DateTime dateTime) {
+  return dateTime.toIso8601String();
+}
+
+/// Convert an ISO8601 string to a DateTime object.
+///
+/// Use this function to convert TEXT timestamp values read from SQLite
+/// back to DateTime objects.
+///
+/// Example:
+/// ```dart
+/// final rows = await db.query('events');
+/// final dateTime = stringToDateTime(rows.first['timestamp'] as String);
+/// ```
+DateTime stringToDateTime(String iso8601String) {
+  return DateTime.parse(iso8601String);
+}
