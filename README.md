@@ -10,6 +10,7 @@ Supports iOS, Android and MacOS.
 * Helpers for insert/query/update/delete queries
 * DB operation executed in a background thread on iOS and Android
 * Linux/Windows/DartVM support using [sqflite_common_ffi](https://pub.dev/packages/sqflite_common_ffi)
+* Support for DateTime (conversion at the wrapper level, not in the engine)
 
 ## Documentation
 
